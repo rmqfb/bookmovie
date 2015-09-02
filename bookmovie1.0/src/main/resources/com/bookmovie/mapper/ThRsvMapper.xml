@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bookmovie.mapper.ThRsvMapper">
+    
+    <insert id="insert" parameterType="ThReservation"> <!--  예약 -->
+        insert into th_reservation(TH_RES_NO,USER_ID,TH_CODE,RSV_DATE,TH_TIME)
+        values(th_res_seq.nextval,#{id},#{thCode},sysdate,#{thTime})
+    </insert> 
+    
+    <delete id="delete" parameterType="java.util.List">  <!-- 체크된 리스트 삭제 -->
+        delete from th_reservation where th_res_no = ANY
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+        	#{item}
+        </foreach> 
+        
+    </delete>
+    
+    <select id="list" resultType="ThReservation" parameterType="Command"> <!-- 장바구니에 담긴 책 목록 불러오기 -->
+	select a.*
+	from( 
+	select 
+		rownum rn,
+		mem.user_id as id,
+		res.rsv_date as rsvDate,
+    	res.th_res_no as thResNo,
+		m.title as mTitle,
+		m.poster as poster,
+		to_char(th.th_date, 'yyyy-mm-dd')as thDate,
+		res.th_time as thTime,
+		th.mp_name as mpName,
+		th.th_name as thName
+		from th_reservation res 
+	    join theater th on res.TH_CODE = th.TH_CODE
+	    join movie m on th.MOVIE_CODE = m.MOVIE_CODE
+	    join member mem on res.USER_ID = mem.USER_ID
+	where 
+		res.user_id=#{searchVal}
+	order by
+	rsv_date desc
+	)a
+	where a.rn between #{start} and #{end}
+    </select>
+  
+    <select id="size" resultType="int" parameterType="Command" >  <!-- 페이징 처리를 위한 목록 개수 가져오기 -->
+        select count(*) 
+        from th_reservation
+        where user_id=#{searchVal}
+        
+    </select>
+</mapper>

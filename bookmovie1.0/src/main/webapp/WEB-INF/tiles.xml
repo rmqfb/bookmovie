@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE  tiles-definitions PUBLIC    
+"-//Aapche Software Foundation//DTD Tiles Configuration 2.1//EN"    
+"http://tiles.apache.org/dtds/tiles-config_2_1.dtd">
+<tiles-definitions>
+	<!-- 부모 레이아웃 -->
+
+	<definition name="layout" template="/WEB-INF/views/layout.jsp">
+		<put-attribute name="header" value=""/>
+		<put-attribute name="content" value=""/>
+		<put-attribute name="footer" value="/WEB-INF/views/home/footer.jsp"/>
+	</definition>
+
+	
+	<!-- 
+	    ***************************************
+		상속을 이용하여 header, footer 를 자동으로 조합
+		 ***************************************
+	 -->
+
+	 <definition name="*/*.tiles" extends="layout">
+	   <put-attribute name ="header" value= "/WEB-INF/views/home/header.jsp" />
+	   <put-attribute name="content" value="/WEB-INF/views/{1}/{2}.jsp"/>
+	 </definition>
+	 <definition name="*/*/*.tiles" extends="layout">
+	 <put-attribute name="header" value="/WEB-INF/views/homes/nulls/header.jsp" />
+	  <put-attribute name="content" value="/WEB-INF/views/{1}/{2}/{3}.jsp" />
+	 
+	 </definition>
+	 <!-- ***************************************
+		no tiles == 타일즈 미적용
+		 ***************************************
+	 -->
+	 <definition name="noTiles" template="/WEB-INF/views/noTemplate.jsp">
+		<put-attribute name="noTemplate" value=""/>
+	</definition>
+	<definition name="*.jsp" extends="noTiles">
+		<put-attribute name="noTemplate" value="/WEB-INF/views/{1}.jsp"/>
+	</definition>
+	<definition name="*/*.jsp" extends="noTiles">
+		<put-attribute name="noTemplate" value="/WEB-INF/views/{1}/{2}.jsp"/>
+	</definition>
+	<definition name="*/*/*.jsp" extends="noTiles">
+		<put-attribute name="noTemplate" value="/WEB-INF/views/{1}/{2}/{3}.jsp"/>
+	</definition>
+</tiles-definitions>
+
+

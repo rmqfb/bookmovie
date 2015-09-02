@@ -1,0 +1,491 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bookmovie.mapper.BookStatMapper">
+    
+    <!-- 기본 통계 정보를 등록합니다. 통계가 생성된 날짜와, 통계 시퀀스, 해당 통계가 어떤 통계인지를 알려주는 정보가 담깁니다. -->
+    <insert id="registerBookStat" parameterType="BookStatMeta">
+    	insert into book_stat_meta (stat_id, reg_date, stat_type_code)
+   		values( #{statId}, sysdate, #{statTypeCode} )
+    </insert>
+    
+    <!-- (유저별) 월간 독서 통계량 데이터가 추출되면 그 데이터 하나 하나를 book_read_stat 테이블에 담습니다. -->
+    <insert id="addBookReadCntStatById" parameterType="BookStatData">
+		insert into book_read_stat(stat_id, user_id, read_cnt, stat_date)
+		values (#{statId}, #{userId}, #{readCnt}, #{statDate})
+    </insert>
+    
+    <!-- (전체) 월간 독서 통계량 데이터가 추출되면 그 데이터 하나 하나를 book_read_stat 테이블에 담습니다. -->
+    <insert id="addBookReadCntStatByAll" parameterType="BookStatData">
+		insert into book_read_stat(stat_id, read_cnt, stat_date)
+		values (#{statId}, #{readCnt}, #{statDate})
+    </insert>
+
+    <!-- 각 도서의 평균 평점을 구하여 book_avg_grade 테이블에 저장합니다. -->
+    <insert id="addBookAvgGradeStat" parameterType="BookStatData">
+    	insert into book_avg_grade(stat_id, book_serial_no, avg_point)
+    	values ( #{statId}, #{bookSerialNo}, #{bookAvgPoint})
+    </insert>
+    
+    <!-- 기본 통계 정보를 삭제합니다. 이와 함께 실제 데이터가 들어있는 통계 테이블의 데이터들도 삭제될 것입니다. -->
+    <delete id="unregisterBookStat" parameterType="int">
+    	delete from book_stat_meta
+    	where stat_id = #{statId}
+    </delete>
+    
+    <!-- 월간 독서량 통계 데이터를 제거합니다. -->
+    <delete id="removeBookReadCntStat" parameterType="int">
+    	delete from book_read_stat 
+   		where stat_id = #{statId}
+    </delete>
+    
+    <!-- 도서 평균 평점 데이터를 제거합니다. -->
+    <delete id="removeBookAvgGradeStat" parameterType="int">
+    	delete from book_avg_grade
+    	where stat_id = #{statId}
+    </delete>
+    
+    <!-- 
+	새로운 통계 정보 등록을 위해 시퀀스를 가져옵니다. 여기서 가져온 시퀀스는 기본 통계 정보를 담는 테이블과
+	통계 데이터가 담긴 테이블에서 같은 값으로 공유됩니다.
+    -->
+    <select id="getNewSequence" resultType="Integer">
+    	select 
+    		book_stat_seq.nextval
+   		from 
+   			dual
+    </select>
+    
+	<!-- 관리자 페이지에서 생성할 수 있는 통계 유형을 가져옵니다. -->
+    <select id="getStatTypes" resultType="BookStatMeta">
+    	select
+    		stat_type_code as "statTypeCode",
+    		stat_type_name as "statTypeName" 
+   		from 
+   			book_stat_type
+    </select>
+    
+    <!-- (각 유저)의 현재 날짜로부터 최대 12개월 전 까지의 월간 독서량 데이터를 추출합니다. -->
+    <select id="extractBookReadCntStatById" resultType="BookStatData">
+		select
+		    brd.user_id userId,
+		    to_char(brd.brd_date, 'yyyy-mm') statDate,
+		    count(*) readCnt
+		from
+		    board_meta brd_meta
+		    join board brd on brd.brd_no = brd_meta.brd_no
+		where
+		    brd_meta.book_serial_no is not null
+		group by
+		    brd.user_id, to_char(brd.brd_date, 'yyyy-mm')
+    </select>
+    
+    <!-- 월간 독서량 데이터를 추출합니다. 유저별이 아닌, 통합 독서량을 구합니다. -->
+    <select id="extractBookReadCntStatByAll" resultType="BookStatData">
+		select
+		    to_char(brd.brd_date, 'yyyy-mm') statDate,
+		    count(*) readCnt
+		from
+		    board_meta brd_meta
+		    join board brd on brd.brd_no = brd_meta.brd_no
+		where
+		    brd_meta.book_serial_no is not null
+		group by
+		    to_char(brd.brd_date, 'yyyy-mm')
+    </select>
+    
+	<!-- 각 책의 평균 평점을 구합니다. -->
+    <select id="extractBookAvgGradeStat" resultType="BookStatData">
+		select
+			book_serial_no bookSerialNo,
+			avg(gpoint) bookAvgPoint
+		from
+			board_meta meta
+		where
+			book_serial_no is not null
+		group by
+			book_serial_no
+    </select>
+    
+    <!-- 해당 책의 평균 평점을 가져옵니다. -->
+    <select id="getAvgGradeBook" resultType="Float" parameterType="Command">
+	    select 
+	        avg.avg_point
+	    from 
+	        book_stat_meta meta
+	        join book_avg_grade avg on avg.stat_id = meta.stat_id 
+	    where
+	        book_serial_no = #{searchVal}
+    </select>
+    
+    <!-- 유저가 읽었던 책들 중 평점을 준 횟수가 많은 순서로 도서 카테고리 리스트를 가져옵니다. -->
+	<select id="getUserFavoriteBookCategoriesStat" resultType="BookStatData" parameterType="Command">
+        select
+        	a.bookSmallCat,
+        	a.readCnt
+        from
+        	(
+		     	select
+		        	rownum rn,
+		        	a.bookSmallCat,
+		        	a.readCnt
+		        from
+		        	(
+		        		select
+				            book.book_category bookSmallCat,
+				            count(*) readCnt
+				        from
+				            board brd
+				            join board_meta meta on brd.brd_no = meta.brd_no
+				            join book on book.book_serial_no = meta.book_serial_no    
+				        where
+				            meta.book_serial_no is not null
+				            and brd.user_id = #{searchVal}
+				        group by
+				            brd.user_id, book.book_category
+				        order by
+				            2 desc
+		        	)a
+        	)a
+        where
+        	a.rn between #{start} and #{end}	
+	</select>
+	
+	<!-- 유저의 월간 독서량 데이터를 가져옵니다. -->
+	<select id="getUserBookReadCntStatByUser" resultType="BookStatData" parameterType="Command">
+		select
+			to_char(stat_date, 'yyyy') || '년' || to_char(stat_date, 'mm') || '월' statDate
+		    read_cnt readCnt
+		from
+		    book_read_stat
+		where
+		    user_id = #{searchVal}
+		    and months_between(sysdate, to_date(stat_date, 'yyyy-mm')) &lt;= 12
+		    and user_id is not null
+	    order by
+	    	1 asc
+	</select>
+	
+	<!-- 통합 월간 독서량 데이터를 가져옵니다. -->
+	<select id="getUserBookReadCntStatByAll" resultType="BookStatData" parameterType="Command">
+		select
+		    regexp_replace(stat_date, '(\d{4})-(\d{2})', '\1년 \2월') statDate,
+		    read_cnt readCnt
+		from
+		    book_read_stat
+		where
+			user_id is null
+		    and months_between(sysdate, to_date(stat_date, 'yyyy-mm')) &lt;= 12
+	    order by
+	    	1 asc
+	</select>
+	    
+	<!-- 주어진 도서 카테고리에서 유저가 높게 평점을 준 책 순으로 책 리스트를 가져옵니다. -->	    
+    <select id="bookRankByCategory" resultType="BookStatData" parameterType="Command">
+		select
+		    a.bookSerialNo,
+		    a.bookTitle,
+		    a.author,
+		    a.publisher,
+		    a.bookGradePoint,
+		    a.bookAvgPoint
+		from
+		    (
+		        select
+		            rownum rn,
+		            a.bookSerialNo,
+		            a.bookTitle,
+		            a.author,
+		            a.publisher,
+		            a.bookGradePoint,
+		            a.bookAvgPoint
+		        from
+		            (
+		                select
+		                    meta.book_serial_no bookSerialNo,
+		                    book.book_title bookTitle,
+		                    book.author,
+		                    book.publisher,
+		                    meta.gpoint bookGradePoint,
+		                    avg.avg_point bookAvgPoint
+		                from
+		                    board brd
+		                    join board_meta meta on brd.brd_no = meta.brd_no
+		                    join book on book.book_serial_no = meta.book_serial_no
+		                    join book_avg_grade avg on avg.book_serial_no = book.book_serial_no
+		                where
+		                    brd.user_id = #{searchVal}
+		                    and book.book_category = #{searchVal2}
+		                order by
+		                    5 desc, 2 asc
+		            )a
+		    )a
+		where
+		    a.rn between #{start} and #{end}
+    </select>
+    
+    <!-- 주어진 도서 카테고리에서 유저가 높게 평점을 준 책 순으로 책 리스트를 가져옵니다. (위 쿼리와 다른 점은, 출력되는 값이 리뷰 텍스트가 추가되고, 평균 평점이 빠지게 됩니다.)-->
+    <select id="bookRankByCategoryAndContentsByUser" resultType="BookStatData" parameterType="Command">
+    	select
+		    a.rn rank,
+		    a.bookSerialNo,
+		    a.bookTitle,
+		    a.author,
+		    a.publisher,
+		    a.bookGradePoint,
+		    a.brdContent
+		from
+		    (
+		        select
+		            rownum rn,
+		            a.bookSerialNo,
+		            a.bookTitle,
+		            a.author,
+		            a.publisher,
+		            a.bookGradePoint,
+		            a.brdContent
+		        from
+		            (
+		                select
+		                    meta.book_serial_no bookSerialNo,
+		                    book.book_title bookTitle,
+		                    book.author,
+		                    book.publisher,
+		                    meta.gpoint bookGradePoint,
+		                    case when length(brd.brd_content) >= 200 then
+		                        substr(brd.brd_content, 1, 200) || '...' 
+		                    else 
+		                        brd.brd_content
+		                    end brdContent
+		                from
+		                    board brd
+		                    join board_meta meta on brd.brd_no = meta.brd_no
+		                    join book on book.book_serial_no = meta.book_serial_no
+		                where
+		                    brd.user_id = #{searchVal}
+		                    and book.book_category = #{searchVal2}
+		                order by
+		                    5 desc, 2 asc
+		            )a
+		    )a
+		where
+		    a.rn between #{start} and #{end}
+    </select>
+
+	<!-- 통계 유형에 해당되는 가장 마지막 통계 ID를 가져옵니다. -->    
+    <select id="getLastStatId" resultType="Integer">
+    	select 
+    		nvl(a.stat_id, 0)
+   		from
+   			(
+   				select 
+		    		stat_id
+		   		from
+		   			book_stat_meta
+		  		where
+		  			stat_type_code = #{statTypeCode}
+		  		order by
+		  			reg_date desc
+   			)a
+ 		where
+ 			rownum = 1
+    </select>
+    
+    <!-- 통계 유형에 해당되는 7일 이내의 가장 마지막 통계 ID를 가져옵니다. -->
+    <select id="getLastWeekStatId" resultType="Integer">
+		select 
+			nvl(stat_id, 0)
+		from
+			book_stat_meta
+		where
+			stat_type_code = #{statTypeCode}
+			and reg_date >= sysdate - interval '7' day
+			and rownum = 1
+    </select>
+    
+    <!-- 주어진 도서 카테고리 내에서 유저가 평점을 준 도서들의 갯수를 가져옵니다. 페이징을 위해 사용됩니다. -->
+    <select id="getTotalCntFromBookRankByCategoryByUser" resultType="Integer" parameterType="Command">
+    	select
+		    count(*)
+		from
+		    board brd
+		    join board_meta meta on brd.brd_no = meta.brd_no
+		    join book on book.book_serial_no = meta.book_serial_no
+		where
+		    brd.user_id = #{searchVal}
+		    and book.book_category = #{searchVal2}
+    </select>
+
+	<!-- 가장 인기 있는 책 정보를 5권 보여줍니다. -->
+	<select id="bestSellerList" resultType="BookStatData">
+		select
+		    a.rn rank,
+		    a.bookTitle,
+		    a.bookSerialNo,
+		    a.publisher,
+		    a.author,
+		    a.bookImgAddr,
+		    a.bookSmallCat,
+		    a.bookMediumCat,
+		    a.bookBigCat,
+		    a.bookAvgPoint,
+		    a.numOfReviewParticipants
+		from
+		    (
+		        select
+		            rownum rn,
+		            a.*
+		        from
+		            (
+		                select
+		                    book.book_title bookTitle,
+		                    book.book_serial_no bookSerialNo,
+		                    book.publisher,
+		                    book.author,
+		                    book.img_addr bookImgAddr,
+		                    book.book_category bookSmallCat,
+		                    cat.book_cat_big bookBigCat,
+		                    cat.book_cat_medium bookMediumCat,
+		                    avg.avg_point bookAvgPoint,
+		                    (select count(*) from board_meta where book_serial_no = book.book_serial_no) numOfReviewParticipants
+		                from
+		                    book_avg_grade avg
+		                    join book on avg.book_serial_no = book.book_serial_no
+		                    join book_cat cat on cat.book_cat_small = book.book_category
+		                order by
+		                    9 desc, 1 asc
+		            )a
+		        where
+		            rownum &lt;= 5
+		    )a
+	</select>
+    
+    <!-- 주어진 책에 대해 가장 높게 평점을 준 3명의 유저의 리뷰 메시지를 가져옵니다. -->
+    <select id="getTop3BoardTitlesOfTheBook" resultType="BookStatData" parameterType="Integer">
+        select
+            a.*
+        from
+            (
+                select   
+                	case when length(brd.brd_title) >= 30 then
+                        substr(brd.brd_title, 1, 30) || '...' 
+                    else 
+                        brd.brd_title
+                    end boardTitle                 
+                from
+                    board brd
+                    join board_meta meta on meta.brd_no = brd.brd_no
+                    join book on book.book_serial_no = meta.book_serial_no
+                where
+                    book.book_serial_no = #{bookSerialNo}
+                order by
+                    meta.gpoint desc
+            )a
+        where
+            rownum &lt;= 3
+    </select>
+    
+    
+    <!-- 메인용. 추가됨 (2015-09-01) -->
+    <select id="favoriteBooks" resultType="BookStatData" parameterType="Command">
+    	select
+    		a.rn rank,
+		    a.bookSerialNo,
+		    a.bookTitle,
+		    a.author,
+		    a.publisher,
+		    a.bookImgAddr,
+		    a.bookGradePoint
+		from
+		    (
+		        select
+		            rownum rn,
+		            a.bookSerialNo,
+		            a.bookTitle,
+		            a.author,
+		            a.publisher,
+		            a.bookImgAddr,
+		            a.bookGradePoint
+		        from
+		            (
+		                select
+		                    meta.book_serial_no bookSerialNo,
+		                    book.book_title bookTitle,
+		                    book.author,
+		                    book.publisher,
+		                    book.img_addr bookImgAddr,
+		                    meta.gpoint bookGradePoint
+		                from
+		                    board brd
+		                    join board_meta meta on brd.brd_no = meta.brd_no
+		                    join book on book.book_serial_no = meta.book_serial_no
+		                where
+		                    brd.user_id = #{searchVal}
+		                order by
+		                    6 desc, 2 asc
+		            )a
+		    )a
+		where
+		    a.rn &lt;= 6
+    </select>
+        
+    <select id="getFavoriteTop3BookCategories" resultType="BookStatData" parameterType="Command">
+    	select
+            a.bookSmallCat
+        from
+            (
+                select
+                    rownum rn,
+                    a.bookSmallCat
+                from
+                    (
+                        select
+                            book.book_category bookSmallCat,
+                            count(*)
+                        from
+                            board brd
+                            join board_meta meta on brd.brd_no = meta.brd_no
+                            join book on book.book_serial_no = meta.book_serial_no    
+                        where
+                            meta.book_serial_no is not null
+                            and brd.user_id = #{searchVal}
+                        group by
+                            book.book_category
+                        order by
+                            2 desc
+                    )a
+            )a
+        where
+            a.rn &lt;= 3
+    </select>    
+        
+    <select id="recentBooksInFavoriteCategories" resultType="BookStatData" parameterType="BookStatData">
+    	select
+		    a.*
+		from
+		    (
+		        select  
+		            book_serial_no bookSerialNo,
+		            book_title bookTitle,
+		            author,
+		            publisher,
+		            book_category bookSmallCat,
+		            press_day pressDay,
+					book.img_addr bookImgAddr
+		        from
+		            book
+		        where
+		            book_category = #{bookSmallCat}
+		        order by
+		            press_day desc
+		    )a
+		where
+		    rownum &lt;= 3
+    </select>  
+    
+    
+    
+    <!-- 메인용. 추가됨 (2015-09-01) -->  
+        
+</mapper>

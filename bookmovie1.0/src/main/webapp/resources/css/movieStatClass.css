@@ -1,0 +1,26 @@
+@CHARSET "UTF-8";
+
+
+
+
+#stat-content .box{ padding:30px;  border:2px solid #e7e7e7; border-radius: 15px; margin:10px 0;  width:auto; }
+#stat-content .msg{ color:#9FC93C; font-size:15pt; }
+#stat-content .button{ border:3px solid #e7e7e7; text-align:center;  display:inline-block; padding:1px 10px; position:relative; }
+#stat-content .button:hover{ background-color:#D5D5D5; text-decoration:none; font-weight:bold; }
+#stat-content .vertical-divider{ width:50px; height:350px; background-image:url("../../image/movieStat/VerticalDividerFade.gif"); background-position:center; background-repeat:repeat-y; }
+#stat-content #favorite-movies .odd-line{ background-color:#F6F6F6; }
+#stat-content #favorite-movies .even-line{ background-color:#FFFFF7; }
+#stat-content #favorite-movies .hovered-line{ font-weight:bold; color:#990085; cursor:pointer; }
+#stat-content ul.category-list{ border-bottom:2px solid #D8D8D8; border-top:2px solid #D8D8D8; }
+#stat-content ul.category-list .selectedCategoryItem{ background-color:#F6F6F6; }
+#stat-content .article-panel{ display:inline-block; margin:0 10px; }
+#stat-content .info{ color:#BDBDBD; font-size:16pt; margin:10px 0; }
+
+#stat-content #popular-movie-list tbody td .hovered{ color:#FF5E00; }
+
+#stat-content #movie-rank .rank-panel .top-ratio{ background-color:#FF0000; color:#FFF; border:4px solid #FFA7A7; }
+#stat-content #movie-rank .rank-panel .high-ratio{ background-color:#FFE400; color:#8C8C8C; border:4px solid #FFFF24; }
+#stat-content #movie-rank .rank-panel .middle-ratio{ background-color:#9FC93C; color:#8C8C8C; border:4px solid #BCE55C; }
+#stat-content #movie-rank .rank-panel .low-ratio{ background-color:#EAEAEA; color:#5D5D5D; border:4px solid #BDBDBD; }
+
+#stat-content .point-panel{ position:absolute; z-index:2;  border:4px solid #8C8C8C; width:250px; padding:8px 0; text-align:center; display:none; background-color:#FFF; }

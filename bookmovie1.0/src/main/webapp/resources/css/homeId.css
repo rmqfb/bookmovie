@@ -1,0 +1,23 @@
+@CHARSET "UTF-8";
+#wrap{
+	width: 100%;
+	text-align: left; /* 글자정렬 왼쪽 */
+	margin: 0;
+	margin-right: auto; /* 환경에 맞게 자동 설정 */
+	margin-left: auto;
+	/* background-repeat: repeat-y; */
+	/* 만약 배경 이미지가 작으면 이미지 반복으로 채운다 */
+	min-height: 750px;
+/* 	모니터에 따라 신축성 있게 헤더가 축소되지만 최소한 750px은 유지하고
+	그 이하가 되면 이미지가 잘리도록 하겠다. */
+	
+}
+
+
+
+
+
+
+
+
+

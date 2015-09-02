@@ -1,0 +1,463 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bookmovie.mapper.MovieStatMapper">
+    
+    <!-- 기본 통계 정보를 등록합니다. 통계가 생성된 날짜와, 통계 시퀀스, 해당 통계가 어떤 통계인지를 알려주는 정보가 담깁니다. -->
+    <insert id="registerMovieStat" parameterType="MovieStatMeta">
+    	insert into movie_stat_meta (stat_id, reg_date, stat_type_code)
+   		values( #{statId}, sysdate, #{statTypeCode} )
+    </insert>
+    
+    <!-- (유저별) 월간 영화 상영 횟수 데이터가 추출되면 그 데이터 하나 하나를 movie_view_stat 테이블에 담습니다. -->
+    <insert id="addMovieReadCntStatByUser" parameterType="MovieStatData">
+    	insert into movie_view_stat(stat_id, user_id, view_cnt, stat_date)
+		values (#{statId}, #{userId}, #{viewCnt}, #{statDate})
+    </insert>
+    
+    <!-- (전체) 월간 영화 상영 횟수 데이터가 추출되면 그 데이터 하나 하나를 movie_view_stat 테이블에 담습니다. -->
+    <insert id="addMovieReadCntStatByAll" parameterType="MovieStatData">
+    	insert into movie_view_stat(stat_id, view_cnt, stat_date)
+		values (#{statId}, #{viewCnt}, #{statDate})
+    </insert>
+    
+    <!-- 각 영화의 평균 평점을 구하여 movie_avg_grade 테이블에 저장합니다. -->
+    <insert id="addMovieAvgGradeStat" parameterType="MovieStatData">
+    	insert into movie_avg_grade(stat_id, movie_code, avg_point)
+    	values ( #{statId}, #{movieCode}, #{movieAvgPoint})
+    </insert>
+    
+    <!-- 기본 통계 정보를 삭제합니다. 이와 함께 실제 데이터가 들어있는 통계 테이블의 데이터들도 삭제될 것입니다. -->
+    <delete id="unregisterMovieStat" parameterType="int">
+    	delete from movie_stat_meta
+    	where stat_id = #{statId}
+    </delete>
+    
+    <!-- 월간 영화 상영 횟수 통계 데이터를 제거합니다. -->
+    <delete id="removeMovieReadCntStat" parameterType="int">
+	    delete from movie_view_stat 
+   		where stat_id = #{statId}
+    </delete>
+    
+    <!-- 영화 평균 평점 데이터를 제거합니다. -->
+    <delete id="removeMovieAvgGradeStat" parameterType="int">
+    	delete from movie_avg_grade
+    	where stat_id = #{statId}
+    </delete>
+    
+    <!-- 
+	새로운 통계 정보 등록을 위해 시퀀스를 가져옵니다. 여기서 가져온 시퀀스는 기본 통계 정보를 담는 테이블과
+	통계 데이터가 담긴 테이블에서 같은 값으로 공유됩니다.
+    -->
+    <select id="getNewSequence" resultType="int">
+    	select 
+    		movie_stat_seq.nextval
+   		from 
+   			dual
+    </select>
+    
+    <!-- 관리자 페이지에서 생성할 수 있는 통계 유형을 가져옵니다. -->
+    <select id="getStatTypes" resultType="MovieStatMeta">
+    	select
+    		stat_type_code as "statTypeCode",
+    		stat_type_name as "statTypeName" 
+   		from 
+   			movie_stat_type
+    </select>
+    
+    <!-- (각 유저)의 현재 날짜로부터 최대 12개월 전 까지의 월간 영화 상영 횟수 데이터를 추출합니다. -->
+    <select id="extractMovieReadCntStatByUser" resultType="MovieStatData">
+    	select
+		    brd.user_id userId,
+		    to_char(brd.brd_date, 'yyyy-mm') statDate,
+		    count(*) viewCnt
+		from
+		    board_meta brd_meta
+		    join board brd on brd.brd_no = brd_meta.brd_no
+		where
+		    brd_meta.movie_code is not null
+		group by
+		    brd.user_id, to_char(brd.brd_date, 'yyyy-mm')
+    </select>
+    
+    <!-- 월간 영화 상영 횟수 데이터를 추출합니다. 유저별이 아닌, 통합 데이터을 구합니다. -->
+    <select id="extractMovieReadCntStatByAll" resultType="MovieStatData">
+    	select
+		    to_char(brd.brd_date, 'yyyy-mm') statDate,
+		    count(*) viewCnt
+		from
+		    board_meta brd_meta
+		    join board brd on brd.brd_no = brd_meta.brd_no
+		where
+		    brd_meta.movie_code is not null
+		group by
+		    to_char(brd.brd_date, 'yyyy-mm')
+    </select>
+    
+    <!-- 각 영화의 평균 평점을 구합니다. -->
+    <select id="extractMovieAvgGradeStat" resultType="MovieStatData">
+    	select
+			movie_code movieCode,
+			avg(gpoint) movieAvgPoint
+		from
+			board_meta meta
+		where
+			movie_code is not null
+		group by
+			movie_code
+    </select>
+    
+    <!-- 해당 영화의 평균 평점을 가져옵니다. -->
+    <select id="getAvgGradeMovie" resultType="Float" parameterType="Command">
+    	select
+		    a.avg_point
+		from
+		    (
+		    select 
+		        rownum rn,
+		        avg.avg_point
+		    from 
+		        movie_stat_meta meta
+		        join movie_avg_grade avg on avg.stat_id = meta.stat_id 
+		    where
+		        avg.movie_code = #{searchVal}
+		    order by
+		        meta.reg_date desc 
+		    )a
+		where   
+		    a.rn = 1
+    </select>
+    
+    <!-- 유저가 봤던 영화들 중 평점을 준 횟수가 많은 순서로 영화 장르 리스트를 가져옵니다. -->
+    <select id="getUserFavoriteMovieCategoriesStat" resultType="MovieStatData" parameterType="Command">
+    	select
+        	a.movieGenre,
+        	a.viewCnt
+        from
+        	(
+		     	select
+		        	rownum rn,
+		        	a.movieGenre,
+		        	a.viewCnt
+		        from
+		        	(
+		        		select
+				            movie.genre movieGenre,
+				            count(*) viewCnt
+				        from
+				            board brd
+				            join board_meta meta on brd.brd_no = meta.brd_no
+				            join movie on movie.movie_code = meta.movie_code    
+				        where
+				            meta.movie_code is not null
+				            and brd.user_id = #{searchVal}
+				        group by
+				            brd.user_id, movie.genre
+				        order by
+				            2 desc
+		        	)a
+        	)a
+        where
+        	a.rn between #{start} and #{end}	
+    </select>
+    
+    <!-- 유저의 월간 영화 상영 횟수 데이터를 가져옵니다. -->
+    <select id="getUserMovieReadCntStatByUser" resultType="MovieStatData" parameterType="Command">
+    	select
+		    regexp_replace(stat_date, '(\d{4})-(\d{2})', '\1년 \2월') statDate,
+		    view_cnt viewCnt
+		from
+		    movie_view_stat
+		where
+		    user_id = #{searchVal}
+		    and months_between(sysdate, to_date(stat_date, 'yyyy-mm')) &lt;= 12
+	    order by
+	    	1 asc
+    </select>
+    
+    <!-- 전체 월간 영화 상영 횟수 데이터를 가져옵니다. -->
+    <select id="getUserMovieReadCntStatByAll" resultType="MovieStatData">
+    	select
+		    regexp_replace(stat_date, '(\d{4})-(\d{2})', '\1년 \2월') statDate,
+		    view_cnt viewCnt
+		from
+		    movie_view_stat
+		where
+		    user_id is null
+		    and months_between(sysdate, to_date(stat_date, 'yyyy-mm')) &lt;= 12
+	    order by
+	    	1 asc
+    </select>
+    
+    <select id="getMovieReadCntStatIds" resultType="int">
+    	select 
+    		distinct stat_id
+   		from
+   			movie_view_stat
+    </select>
+    
+    <select id="getMovieAvgGradeStatIds" resultType="int">
+    	select 
+    		distinct stat_id
+   		from
+   			movie_avg_grade
+    </select>
+
+	<!-- 주어진 영화 장르 내에서 유저가 평점을 준 영화들의 갯수를 가져옵니다. 페이징을 위해 사용됩니다. -->
+	<select id="getTotalCntFromMovieRankByCategory" resultType="int" parameterType="Command">
+		select
+		    count(*)
+		from
+		    board brd
+		    join board_meta meta on brd.brd_no = meta.brd_no
+		    join movie on movie.movie_code = meta.movie_code
+		where
+		    brd.user_id = #{searchVal}
+		    and movie.genre = #{searchVal2}
+	</select>
+    
+    <!-- 주어진 영화 장르에서 유저가 높게 평점을 준 영화 순으로 영화 리스트를 가져옵니다. -->
+    <select id="movieRankByCategory" resultType="MovieStatData" parameterType="Command">
+    	 select
+		    a.movieCode,
+		    a.movieTitle,
+		    a.movieViewTime,
+		    a.movieGradePoint,
+		    a.movieAvgPoint
+		from
+		    (
+		        select
+		            rownum rn,
+		            a.movieCode,
+		            a.movieTitle,
+		            a.movieViewTime,
+		            a.movieGradePoint,
+		            a.movieAvgPoint
+		        from
+		            (
+		                select
+		                    meta.movie_code movieCode,
+		                    movie.title movieTitle,
+		                    to_char(movie.view_time, 'hh') || '시간' || to_char(movie.view_time, 'mi') || '분' movieViewTime,
+		                    meta.gpoint movieGradePoint,
+		                    avg.avg_point movieAvgPoint
+		                from
+		                    board brd
+		                    join board_meta meta on brd.brd_no = meta.brd_no
+		                    join movie on movie.movie_code = meta.movie_code
+		                    join movie_avg_grade avg on avg.movie_code = movie.movie_code
+		                where
+		                    brd.user_id = #{searchVal}
+		                    and movie.genre = #{searchVal2}
+		                order by
+		                    5 desc, 2 asc
+		            )a
+		    )a
+		where
+		    a.rn between #{start} and #{end}
+    </select>
+
+	<!-- 주어진 영화 장르에서 유저가 높게 평점을 준 영화 순으로 영화 리스트를 가져옵니다. (위 쿼리와 다른 점은, 출력되는 값이 리뷰 메시지가 추가되고, 평균 평점이 빠지게 됩니다.)-->
+    <select id="movieRankByCategoryAndContentsByUser" resultType="MovieStatData" parameterType="Command">
+    	select
+		    a.rn rank,
+		    a.movieCode,
+		    a.movieTitle,
+		    a.movieGradePoint,
+		    a.brdContent
+		from
+		    (
+		        select
+		            rownum rn,
+		            a.movieCode,
+		            a.movieTitle,
+		            a.movieGradePoint,
+		            a.brdContent
+		        from
+		            (
+		                select
+		                    meta.movie_code movieCode,
+		                    movie.title movieTitle,
+		                    meta.gpoint movieGradePoint,
+		                    case when length(brd.brd_content) >= 200 then
+		                        substr(brd.brd_content, 1, 200) || '...' 
+		                    else 
+		                        brd.brd_content
+		                    end brdContent
+		                from
+		                	board brd
+		                    join board_meta meta on brd.brd_no = meta.brd_no
+		                    join movie on movie.movie_code = meta.movie_code
+		                where
+		                    brd.user_id = #{searchVal}
+		                    and movie.genre = #{searchVal2}
+		                order by
+		                    3 desc, 2 asc
+		            )a
+		    )a
+		where
+		    a.rn between #{start} and #{end} 
+    </select>
+    
+	<!-- 회원들 사이에서 가장 인기있는 영화 5개를 가져옵니다. -->    
+    <select id="popularMovieList" resultType="MovieStatData">
+    	select
+		    a.rn rank,
+		    a.movieCode,
+		    a.movieTitle,
+		    a.movieGenre,
+		    a.movieViewTime,
+		    a.moviePoster,
+		    a.movieAvgPoint,
+		    a.numOfReviewParticipants
+		from
+		    (
+		        select
+		            rownum rn,
+		            a.*
+		        from
+		            (
+		                select
+                            movie.movie_code movieCode,
+                            movie.title movieTitle,
+                            movie.genre movieGenre,
+                            movie.poster moviePoster,
+                            to_char(movie.view_time, 'hh') || '시간' || to_char(movie.view_time, 'mi') || '분' movieViewTime,
+                            avg.avg_point movieAvgPoint,
+		                    (select count(*) from board_meta where movie_code = movie.movie_code) numOfReviewParticipants
+		                from
+		                    movie_avg_grade avg
+		                    join movie on movie.movie_code = avg.movie_code
+		                order by
+		                    6 desc, 2 asc
+		            )a
+		        where
+		            rownum &lt;= 5
+		    )a
+    </select>
+ 
+	<!-- 주어진 영화에 대해 가장 높게 평점을 준 3명의 유저의 리뷰 메시지를 가져옵니다. -->   
+    <select id="getTop3BoardTitlesOfTheMovie" resultType="MovieStatData" parameterType="String">
+    	select
+		    a.*
+		from
+		    (
+		        select   
+		            case when length(brd.brd_title) >= 30 then
+		                substr(brd.brd_title, 1, 30) || '...' 
+		            else 
+		                brd.brd_title
+		            end boardTitle                 
+		        from
+		            board brd
+		            join board_meta meta on meta.brd_no = brd.brd_no
+		            join movie on movie.movie_code = meta.movie_code
+		        where   
+		            movie.movie_code = #{movieCode}
+		        order by
+		            meta.gpoint desc
+		    )a
+		where
+		    rownum &lt;= 3
+    </select>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <!-- 메인용. 추가됨 (2015-09-01) -->
+    <select id="favoriteMovies" resultType="MovieStatData" parameterType="Command">
+    	select
+		    a.rn rank,
+		    a.movieCode,
+		    a.movieGenre,
+		    a.movieTitle,
+		    a.moviePoster
+		from
+		    (
+		        select
+		            rownum rn,
+		            a.*
+		        from
+		            (
+		                select
+		                    meta.movie_code movieCode,
+		                    movie.genre movieGenre,
+		                    movie.title movieTitle,
+		                    movie.poster moviePoster
+		                from
+		                    board brd
+		                    join board_meta meta on brd.brd_no = meta.brd_no
+		                    join movie on movie.movie_code = meta.movie_code
+		                where
+		                    brd.user_id = #{searchVal}
+		                order by
+		                    meta.gpoint desc, 2 asc
+		            )a
+		    )a
+		where
+		    a.rn &lt;= 6
+    </select>
+    
+    <select id="getFavoriteTop3MovieGenres" resultType="MovieStatData" parameterType="Command">
+    	select
+		    a.movieGenre
+		from
+		    (
+		        select
+		            rownum rn,
+		            a.movieGenre
+		        from
+		            (
+		                select
+		                    movie.genre movieGenre,
+		                    count(*) cnt
+		                from
+		                    board brd
+		                    join board_meta meta on brd.brd_no = meta.brd_no
+		                    join movie on movie.movie_code = meta.movie_code   
+		                where
+		                    meta.movie_code is not null
+		                    and brd.user_id = #{searchVal}
+		                group by
+		                    movie.genre
+		                order by
+		                    2 desc, 1 asc
+		            )a
+		    )a
+		where
+		    a.rn &lt;= 3
+    </select>
+    
+    <select id="getRecentMoviesInGenre" resultType="MovieStatData" parameterType="MovieStatData">
+    	select
+		    a.*
+		from
+		    (
+		        select  
+		            movie_code movieCode,
+		            genre movieGenre,
+		            title movieTitle,
+		            poster moviePoster
+		        from
+		            movie
+		        where
+		            genre = #{movieGenre}
+		        order by
+		            reg_date desc
+		    )a
+		where
+		    rownum &lt;= 3
+    </select>
+    <!-- 메인용. 추가됨 (2015-09-01) -->
+    
+    
+    
+</mapper>

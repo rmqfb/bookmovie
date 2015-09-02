@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<settings>
+		<setting name="cacheEnabled" value="true" />
+		<setting name="lazyLoadingEnabled" value="true" />
+		<setting name="multipleResultSetsEnabled" value="true" />
+		<setting name="useColumnLabel" value="true" />
+		<setting name="useGeneratedKeys" value="false" />
+		<setting name="autoMappingBehavior" value="PARTIAL" />
+		<setting name="defaultExecutorType" value="SIMPLE" />
+		<setting name="defaultStatementTimeout" value="25" />
+		<setting name="safeRowBoundsEnabled" value="false" />
+		<setting name="mapUnderscoreToCamelCase" value="false" />
+		<setting name="localCacheScope" value="SESSION" />
+		<setting name="jdbcTypeForNull" value="OTHER" />
+		<setting name="lazyLoadTriggerMethods" value="equals,clone,hashCode,toString" />
+	</settings>
+	
+	<typeAliases>
+		<typeAlias type="com.bookmovie.domain.MemberDto" alias="Member"/>
+		<typeAlias type="com.bookmovie.domain.ReservationDto" alias="Reservation"/>
+		<typeAlias type="com.bookmovie.domain.BookReviewDto" alias="bReview"/>
+		<typeAlias type="com.bookmovie.domain.BookDto" alias="Book"/>
+		<typeAlias type="com.bookmovie.domain.StatDto" alias="Stat"/>
+		<typeAlias type="com.bookmovie.domain.BoardDto" alias="Board"/>
+		<typeAlias type="com.bookmovie.factory.Orderable" alias="Command"/>
+		<typeAlias type="com.bookmovie.domain.MovieDto" alias="movie"/>
+		<typeAlias type="com.bookmovie.domain.MovieReviewDto" alias="mReview"/>
+	    <typeAlias type="com.bookmovie.domain.MovieStatMetaDto" alias="MovieStatMeta"/>
+        <typeAlias type="com.bookmovie.domain.MovieStatDataDto" alias="MovieStatData"/>
+        <typeAlias type="com.bookmovie.domain.BookStatMetaDto" alias="BookStatMeta"/>
+        <typeAlias type="com.bookmovie.domain.BookStatDataDto" alias="BookStatData"/>
+        <typeAlias  type="com.bookmovie.domain.TheaterDto" alias="Theater"/>
+        <typeAlias type="com.bookmovie.domain.ThRsvDto" alias="ThReservation"/>
+	</typeAliases>
+	<mappers>
+		<mapper resource="com/bookmovie/mapper/MemberMapper.xml" />
+		<mapper resource="com/bookmovie/mapper/ReservationMapper.xml" />
+		<mapper resource="com/bookmovie/mapper/BookMapper.xml" />
+		<mapper resource="com/bookmovie/mapper/BookReviewMapper.xml"/>
+		<mapper resource="com/bookmovie/mapper/StatMapper.xml" />
+		<mapper resource="com/bookmovie/mapper/BoardMapper.xml" />
+		<mapper resource="com/bookmovie/mapper/MovieMapper.xml"/>
+		<mapper resource="com/bookmovie/mapper/MovieReviewMapper.xml"/>
+		<mapper resource="com/bookmovie/mapper/BookStatMapper.xml"/>
+        <mapper resource="com/bookmovie/mapper/MovieStatMapper.xml"/>
+        <mapper resource="com/bookmovie/mapper/TheaterMapper.xml"/>
+        <mapper resource="com/bookmovie/mapper/ThRsvMapper.xml"/>
+	</mappers>
+</configuration>

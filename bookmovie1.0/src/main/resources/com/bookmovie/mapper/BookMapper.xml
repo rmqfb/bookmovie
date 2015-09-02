@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bookmovie.mapper.BookMapper">
+	<!-- 카테고리 대분류 -->
+    <select id="bigCat" resultType="Book">
+       select distinct c.BOOK_CAT_big as bigCat
+       from book_cat c full join book b
+       on c.BOOK_CAT_small = b.BOOK_CATEGORY
+    </select>
+    <!-- 카테고리 중분류 -->
+    <select id="mediumCat" resultType="Book" parameterType="Command">
+       select C.BOOK_CAT_BIG as bigCat, c.BOOK_CAT_medium as mediumCat
+       from book_cat c full join book b
+       on c.BOOK_CAT_small = b.BOOK_CATEGORY
+       where C.BOOK_CAT_BIG = #{searchVal}
+       group by C.BOOK_CAT_BIG,c.BOOK_CAT_medium
+       order by 1 asc
+    </select>
+    <!-- 카테고리 소분류 -->
+    <select id="smallCat" resultType="Book" parameterType="Command">
+        select C.BOOK_CAT_MEDIUM as mediumCat, c.BOOK_CAT_SMALL as smallCat
+       from book_cat c full join book b
+       on c.BOOK_CAT_small = b.BOOK_CATEGORY
+       where C.BOOK_CAT_MEDIUM = #{searchVal}
+       group by C.BOOK_CAT_MEDIUM, c.BOOK_CAT_SMALL
+       order by 1 asc
+    </select>
+    <!-- 책 카테고리 검색 리스트 -->
+    <select id="search" resultType="Book" parameterType="Command">
+         select t2.* from (select
+          rownum as seq, t.* 
+         from(
+        select
+        b.book_serial_no as serialNo,
+    	b.book_title as bTitle,
+    	b.author as author,
+    	b.img_addr as imgAddr,
+    	to_char(b.press_day, 'yyyy-mm-dd')as pressDay,
+    	b.publisher as publisher,
+    	b.book_category as smallCat
+         from Book b join Book_Cat c
+         on C.BOOK_CAT_SMALL = B.BOOK_CATEGORY
+         and b.book_category = #{searchVal}
+         order by serialNo asc
+         ) t)t2 
+    	where t2.seq between #{start} and #{end}
+    	order by t2.seq asc
+    </select>
+    <!-- 통합검색 -->
+    <select id="searching" resultType="Book" parameterType="Command">
+         select t2.* from (select
+          rownum as seq, t.* 
+         from(
+        select
+  		book_serial_no as serialNo,
+    	book_title as bTitle,
+    	author as author,
+    	img_addr as imgAddr,
+    	to_char(press_day, 'yyyy-mm-dd')as pressDay,
+    	publisher as publisher,
+    	book_category as smallCat
+         from Book
+         where ${searchKey} like '%' || #{searchVal} || '%'
+         order by book_serial_no asc
+         ) t)t2 
+    	where t2.seq between #{start} and #{end}
+    	order by t2.seq asc
+    </select>
+    
+    <select id="detail" resultType="Book" parameterType="Command">
+          select
+        book_serial_no as serialNo,
+    	book_title as bTitle,
+    	author as author,
+    	img_addr as imgAddr,
+    	to_char(press_day, 'yyyy-mm-dd')as pressDay,
+    	publisher as publisher,
+    	book_category as smallCat,
+    	detail as detail
+         from Book
+         where book_serial_no = #{searchVal}
+    </select>
+  
+     <select id="size" resultType="int" parameterType="Command" >
+        select count(*) 
+         from Book b join Book_Cat c
+         on C.BOOK_CAT_SMALL = B.BOOK_CATEGORY
+        where b.book_category = #{searchVal}
+    </select>
+    <select id="keywordsize" resultType="int" parameterType="Command" >
+        select count(*) 
+         from Book
+        where ${searchKey} like '%' || #{searchVal} || '%'
+    </select>
+    
+</mapper>

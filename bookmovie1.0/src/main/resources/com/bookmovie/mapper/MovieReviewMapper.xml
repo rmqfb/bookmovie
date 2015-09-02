@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bookmovie.mapper.MovieReviewMapper">
+
+ 	<!-- 글삭제 -->
+     <delete id="delete" parameterType="mReview" >
+    	delete from Board
+    	where brd_no = #{brdNo}
+    </delete>
+    
+    <!-- 글수정 -->
+	<update id="update" parameterType="bReview" >
+        update Board
+        set brd_title = #{brdTitle},
+      	brd_content = #{brdContent}
+        where brd_no = #{brdNo}
+    </update>
+    
+    <!-- 영화 리뷰 작성 -->
+     <insert id="insert" parameterType="mReview">
+    	insert into Board(BRD_NO,USER_ID,BRD_TYPE,BRD_CATEGORY,BRD_TITLE,BRD_CONTENT,BRD_DATE,BRD_VIEWS) 
+        values(
+         BRD_NO.NEXTVAL,#{userId},1002,#{genre},#{brdTitle},#{brdContent},sysdate, 0
+        )
+    </insert>
+    
+    <!-- 보드메타 인서트 -->
+     <insert id="insert2" parameterType="mReview">
+	     insert into board_meta(
+		     BRD_NO,
+		     USER_ID,
+		     MOVIE_CODE,
+		     gpoint
+	     )
+	     values(
+	     	#{brdNo},#{userId},#{movieCode},#{gPoint}
+	     )
+    </insert>
+    
+     <select id="getBrdSeq" resultType="int">
+   		select BRD_NO.currval from dual
+   </select>
+
+	<!-- 영화리뷰 리스트 출력 -->
+	<select id="list" resultType="mReview" parameterType="Command" >
+	    select t2.* from (select
+          rownum as seq, t.* 
+         from(
+	    select 
+	    META.BRD_NO as brdNo,
+	     META.USER_ID as userId,
+	     m.poster as poster,
+	     m.title as title,
+	     m.movie_code as movieCode,
+	     m.genre as genre,
+	     m.movie_info as movieInfo,
+	     brd.brd_title brdTitle,
+	     brd.brd_date as brdDate,
+	     brd.brd_views as brdViews
+		from BOARD_META meta join BOARD brd on META.BRD_NO = BRD.BRD_NO
+        join Movie m on m.movie_code = meta.movie_code
+        where brd.brd_type = 1002
+        order by brd.brd_No desc
+         ) t)t2 
+    	where t2.seq between #{start} and #{end}
+    	order by t2.seq asc
+  </select>
+  
+  <!-- 리뷰 개수 -->
+     <select id="size" resultType="int" parameterType="Command" >
+        select count(*)
+	    from BOARD_META meta join BOARD brd on META.BRD_NO = BRD.BRD_NO
+        join movie m on m.movie_code = meta.movie_code
+        where brd.brd_type = 1002
+    </select>
+    
+     <!-- 통합검색 -->
+    <select id="search" resultType="mReview" parameterType="Command">
+         select t2.* from (select
+          rownum as seq, t.* 
+         from(
+        select 
+	    META.BRD_NO as brdNo,
+	     META.USER_ID as userId,
+	     m.poster as poster,
+	     m.title as title,
+	     m.movie_code as movieCode,
+	     m.genre as genre,
+	     m.movie_info as movieInfo,
+	     brd.brd_title brdTitle,
+	     brd.brd_date as brdDate,
+	     brd.brd_views as brdViews
+		from BOARD_META meta join BOARD brd on META.BRD_NO = BRD.BRD_NO
+        join Movie m on m.movie_code = meta.movie_code
+        where ${searchKey} like '%' || #{searchVal} || '%'
+        and brd.brd_type = 1002
+         order by brd.brd_date desc
+         ) t)t2 
+    	where t2.seq between #{start} and #{end}
+    	order by t2.seq asc
+    </select>
+    
+    <!-- 검색어 결과 갯수 -->
+    <select id="keywordsize" resultType="int" parameterType="Command" >
+        select count(*) 
+         	from BOARD_META meta join BOARD brd on META.BRD_NO = BRD.BRD_NO
+        	join movie m on m.movie_code = meta.movie_code
+        where brd.brd_type = 1002 and ${searchKey} like '%' || #{searchVal} || '%'
+    </select>
+    
+    <!-- 리뷰 상세보기 -->
+     <select id="detail" resultType="mReview" parameterType="Command">
+          select
+         META.BRD_NO as brdNo,
+	     META.USER_ID as userId,
+	     m.poster as poster,
+	     m.title as title,
+	     m.movie_code as movieCode,
+	     m.genre as genre,
+	     m.movie_info as movieInfo,
+	     brd.brd_title brdTitle,
+	     brd.brd_date as brdDate,
+	     brd.brd_views as brdViews,
+	     brd.brd_content as brdContent
+         from BOARD_META meta join BOARD brd on META.BRD_NO = BRD.BRD_NO
+        join Movie m on m.movie_code = meta.movie_code
+        where brd.brd_no = #{searchVal}
+    </select>
+    
+    <!-- 리뷰작성 확인 -->
+    <select id="count" resultType="int" parameterType="Command" >
+        select count(*) 
+             from BOARD_META meta join BOARD brd on META.BRD_NO = BRD.BRD_NO
+            join movie m on m.movie_code = meta.movie_code
+        where meta.movie_code = #{searchKey}
+        and meta.user_id like #{searchVal}
+    </select>
+    
+     <!-- 리뷰 영화정보 가져오기 -->
+    <select id="detail2" resultType="mReview" parameterType="Command">
+           select
+           movie_code as movieCode,
+           title as title,
+           genre as genre
+           from movie
+        where ${searchKey} = #{searchVal}
+    </select>
+</mapper>

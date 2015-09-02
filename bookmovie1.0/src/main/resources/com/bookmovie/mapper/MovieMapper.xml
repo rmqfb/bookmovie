@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bookmovie.mapper.MovieMapper">
+    
+    <insert id="insert" parameterType="Board">
+     insert into board(
+     BRD_NO, 
+     USER_ID, 
+     BRD_TYPE, 
+     BRD_CATEGORY, 
+     BRD_TITLE, 
+     BRD_CONTENT, 
+     BRD_DATE, 
+     BRD_VIEWS
+     )
+     values(
+      BRD_NO.NEXTVAL,#{userId},1002,#{category},#{boardTitle},#{boardContent},sysdate,0
+     )
+    </insert>
+    
+     <insert id="insert2" parameterType="Board">
+	     insert into board_meta(
+		     BRD_NO,
+		     USER_ID,
+		     MOVIE_CODE,
+		     gpoint
+	     )
+	     values(
+	     	#{boardNum},#{userId},#{movieCode},#{gPoint}
+	     )
+    </insert>
+    
+     <select id="searchSeq" resultType="int">
+   		select BRD_NO.currval from dual
+   </select>
+    
+   <update id="update" parameterType="Board">
+     update board set brd_title = #{searchKey}, brd_content=#{searchVal} where brd_no = #{theme}
+   </update>
+   
+  
+    
+      
+	 <select id="list" resultType="Movie" parameterType="Command">
+		  
+	select t2.* from (select 
+       rownum as seq,t.*
+        from (
+            select  
+	             genre as genre,
+			 	 title as title,
+			  	 view_time as viewTime,
+			 	 poster as poster,
+			   	 reg_date as regDate,
+			 	 background as background,
+			 	 iframe as iframe,
+			 	 movie_info as movieInfo,
+			 	 movie_code as movieCode
+            from movie 
+                order by reg_date desc
+                	) t)t2
+	        where t2.seq between #{start} and #{end}
+	        order by t2.seq desc
+		  
+		  
+	</select>
+	
+	<select id="detail" resultType="Movie" parameterType="Command">
+	
+		select
+	          genre as genre,
+	          title as title,
+	          view_time as viewTime,
+	          poster as poster,
+	          reg_date as regDate,
+	          background as background,
+	          iframe as iframe,
+	          movie_info as movieInfo,
+	          movie_code as movieCode
+	       from movie
+	       where movie_code  =  #{searchVal}  
+	
+	
+		<!--   select
+	          m.genre as genre,
+	          m.title as title,
+	          m.view_time as viewTime,
+	          m.poster as poster,
+	          m.reg_date as regDate,
+	          m.background as background,
+	          m.iframe as iframe,
+	          m.movie_info as movieInfo,
+	          m.movie_code as movieCode,
+	          b.BRD_NO as boardNum,
+	          brd.brd_content as boardContent,
+	          brd.brd_title as boardTitle
+	          
+	       from movie m 
+	               join  board_meta b  on  m.movie_code = b.MOVIE_CODE(+) 
+	               join  board brd on brd.brd_no = b.brd_no
+	       where m.movie_code  =  #{searchVal}  
+	       and b.user_id = #{searchKey} -->
+	</select>
+    
+    <!-- 영화 -->
+    <!-- <select id="detail2" resultType="BoardMovie2" parameterType="Command">
+		  select
+	          m.genre as genre,
+	          m.title as title,
+	          m.view_time as viewTime,
+	          m.poster as poster,
+	          m.reg_date as regDate,
+	          m.background as background,
+	          m.iframe as iframe,
+	          m.movie_info as movieInfo,
+	          m.movie_code as movieCode,
+	          b.BRD_NO as boardNum
+	       from movie m 
+	               join   board_meta b  on  m.movie_code = b.MOVIE_CODE(+) 
+	       where m.movie_code  =  #{searchVal}  
+	       
+	</select>
+  
+   
+    
+    <select id="searchReview" resultType="BoardMovie" parameterType="Command">
+        select 
+		      a.genre as genre,
+	          a.title as title,
+	          a.view_time as viewTime,
+	          a.poster as poster,
+	          a.reg_date as regDate,
+	          a.background as background,
+	          a.iframe as iframe,
+	          a.movie_info as movieInfo,
+	          a.movie_code as movieCode,
+	          m.USER_ID as userId,
+	          m.BRD_TYPE as boardType,
+	          m.BRD_NO as boardNum,
+	          m.BRD_CATEGORY as category,
+	          m.BRD_TITLE as boardTitle,
+	          m.BRD_CONTENT as boardContent,
+	          m.BRD_DATE as boardDate,
+	          m.BRD_VIEWS as readcnt,
+	          m2.name as name,
+	          meta.gpoint as gPoint
+            from board m   
+            join board_meta meta on m.brd_no = meta.brd_no
+            join movie a on a.movie_code = meta.movie_code 
+            join member m2 on m2.user_id = meta.user_id
+            where meta.movie_code = #{searchVal}
+                and m.user_id =  #{searchKey}
+
+    </select>
+     -->
+    <!-- 
+     <delete id="delete" parameterType="BoardMovie" >
+    	delete from Board
+    	where brd_no = #{boardNum}
+    </delete> -->
+    
+    
+    <select id="size" resultType="int" parameterType="Command" >
+        select count(*) 
+        from movie
+    </select>
+     <select id="count" resultType="int" parameterType="Command" >
+        select count(*) 
+             from BOARD_META meta join BOARD brd on META.BRD_NO = BRD.BRD_NO
+            join movie m on m.movie_code = meta.movie_code
+        where meta.movie_code = #{searchKey}
+        and meta.user_id like #{searchVal}
+    </select>
+  
+    
+</mapper>

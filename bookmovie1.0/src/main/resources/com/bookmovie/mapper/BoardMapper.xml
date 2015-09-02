@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bookmovie.mapper.BoardMapper">
+    
+    <!--글작성  -->
+    <insert id="insert"  parameterType="Board">
+    insert into BOARD(BRD_NO, BRD_TYPE,USER_ID,BRD_CATEGORY,BRD_TITLE,BRD_CONTENT)
+    values(BRD_NO.NEXTVAL,#{theme},#{userId},#{category},#{title},#{boardContent})
+    </insert>
+    <!--글수정-->
+    <update id="update" parameterType="Board">
+    update board set 
+    BRD_CATEGORY= #{category},
+    BRD_TITLE= #{title},
+    BRD_CONTENT =#{boardContent}
+     where BRD_NO = #{boardNum}
+    </update>
+   
+    <!--삭제-->
+    <delete id="delete"  parameterType="Command">
+    delete from board 
+    where BRD_NO = #{boardNum}
+    </delete>
+    
+    <!--상세보기-->
+    <select id="detail" resultType="Board" parameterType="Command">
+     select  
+      b.BRD_NO as boardNum,
+      b.BRD_TYPE as theme,
+      b.USER_ID as userId , 
+      to_char(b.BRD_DATE,'yyyy-mm-dd hh24:mi:ss') as boardDate,
+      b.BRD_VIEWS as readCnt,
+      b.BRD_TITLE as title,
+      b.BRD_CATEGORY as category, 
+      b.BRD_CONTENT as boardContent,
+      m.NAME as name
+      from board b join member m
+      on b.BRD_TYPE = #{theme} 
+      and b.USER_ID = m.USER_ID
+      and b.BRD_NO = #{searchVal}
+       
+      
+    </select>
+   
+    <!--조회-->
+     <select id="search" resultType="Board" parameterType="Command">
+      select t2.* from (select 
+      rownum as seq,t.* 
+      from(
+      select 
+      b.BRD_NO as boardNum,
+      b.BRD_TYPE as theme,
+      b.USER_ID as userId , 
+      to_char(b.BRD_DATE,'yyyy-mm-dd hh24:mi:ss') as boardDate,
+      b.BRD_VIEWS as readCnt,
+      b.BRD_TITLE as title, 
+      m.NAME as name,
+      b.BRD_CATEGORY as category,
+      b.BRD_CONTENT as boardContent
+      from board b join member m
+      on b.USER_ID = m.USER_ID
+      and b.USER_ID = #{searchVal}
+      and b.BRD_TYPE = #{theme}
+      order by BRD_DATE desc
+      )t)t2
+      where t2.seq between #{start} and #{end}
+      order by t2.seq asc
+    </select>
+    <select id="boardsearch" resultType="Board" parameterType="Command">
+    select t2.* from (select
+         rownum as seq, t.* 
+         from(
+        select
+  		b.BRD_NO as boardNum,
+    	b.BRD_TYPE as theme,
+    	b.USER_ID as userId,
+    	to_char(b.BRD_DATE,'yyyy-mm-dd hh24:mi:ss') as boardDate,
+    	b.BRD_VIEWS as readCnt,
+    	b.BRD_TITLE as title, 
+        b.BRD_CATEGORY as category,
+        b.BRD_CONTENT as boardContent
+        from board b 
+        where ${searchKey} like '%' || #{searchVal} || '%'
+         and b.BRD_TYPE = 1003
+         order by b.BRD_NO asc
+         ) t)t2 
+    	where t2.seq between #{start} and #{end}
+    	order by t2.seq asc
+    
+    </select>
+  
+    <!--리스트
+      이거는 쓰여지질를 않는것같다 ..나중에정리?
+    -->
+    
+     <select id="list" resultType="Board" parameterType="Command">
+       select t2.* from (select 
+      rownum as seq,t.* 
+      from(
+      select 
+      b.BRD_NO as boardNum,
+      b.BRD_TYPE as theme,
+      b.USER_ID as userId , 
+      to_char(b.BRD_DATE,'yyyy-mm-dd hh24:mi:ss') as boardDate,
+      b.BRD_VIEWS as readCnt,
+      b.BRD_TITLE as title, 
+      b.BRD_CONTENT as boardContent,
+      m.NAME as name
+      from board b join member m
+      on b.USER_ID = m.USER_ID
+      and b.BRD_TYPE = #{theme}
+      order by BRD_DATE desc
+      )t)t2
+      where t2.seq between #{start} and #{end}
+      order by t2.seq asc
+    </select>
+  
+    <!--사이즈-->
+     <select id="size" resultType="int" parameterType="Command">
+     select count(*)
+	    from  BOARD b 
+        where b.BRD_TYPE = 1003
+    
+    </select>
+    <!-- 검색어 결과 갯수 -->
+    <select id="keywordsize" resultType="int" parameterType="Command" >
+        select count(*) 
+         	from BOARD b
+        where b.BRD_TYPE = 1003 and ${searchKey} like '%' || #{searchVal} || '%'
+    </select>
+  
+     <!--카운트-->
+     <select id="count" resultType="int" parameterType="Command">
+         select count(*) 
+         from board
+         where ${searchKey} like '%' || #{searchVal} || '%'
+    </select>
+   
+</mapper>

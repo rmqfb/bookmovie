@@ -1,0 +1,111 @@
+@CHARSET "UTF-8";
+.w-max{width : 1070px}
+.w-1000{width : 1000px}
+.w-900{width : 900px}
+.w-800{width : 800px}
+.w-700{width : 700px}
+.w-600{width : 600px}
+.w-500{width : 500px}
+.w-400{width : 400px}
+.w-300{width : 300px}
+.w-200{width : 200px}
+.w-100{width : 100px}
+.h-max{height : 1070px}
+.h-1000{height : 1000px}
+.h-900{height : 900px}
+.h-800{height : 800px}
+.h-700{height : 700px}
+.h-600{height : 600px}
+.h-500{height : 500px}
+.h-400{height : 400px}
+.h-300{height : 300px}
+.h-200{height : 200px}
+.h-100{height : 100px}
+.w-100p{width : 100%}
+.w-90p{width : 90%}
+.w-80p{width : 80%}
+.w-70p{width : 70%}
+.w-60p{width : 60%}
+.w-50p{width : 50%}
+.w-40p{width : 40%}
+.w-30p{width : 30%}
+.w-20p{width : 20%}
+.w-10p{width : 10%}
+.h-100p{height : 100%}
+.h-90p{height : 90%}
+.h-80p{height : 80%}
+.h-70p{height : 70%}
+.h-60p{height : 60%}
+.h-50p{height : 50%}
+.h-40p{height : 40%}
+.h-30p{height : 30%}
+.h-20p{height : 20%}
+.h-10p{height : 10%}
+.mt-100{margin-top : 100px}
+.mt-90{margin-top : 90px}
+.mt-80{margin-top : 80px}
+.mt-70{margin-top : 70px}
+.mt-60{margin-top : 60px}
+.mt-50{margin-top : 50px}
+.mt-40{margin-top : 40px}
+.mt-30{margin-top : 30px}
+.mt-20{margin-top : 20px}
+.mt-10{margin-top : 10px}
+.mr-100{margin-left : 100px}
+.mr-90{margin-left : 90px}
+.mr-80{margin-left : 80px}
+.mr-70{margin-left : 70px}
+.mr-60{margin-left : 60px}
+.mr-50{margin-left : 50px}
+.mr-40{margin-left : 40px}
+.mr-30{margin-left : 30px}
+.mr-20{margin-left : 20px}
+.mr-10{margin-left : 10px}
+.mb-100{margin-bottom : 100px}
+.mb-90{margin-bottom : 90px}
+.mb-80{margin-bottom : 80px}
+.mb-70{margin-bottom : 70px}
+.mb-60{margin-bottom : 60px}
+.mb-50{margin-bottom : 50px}
+.mb-40{margin-bottom : 40px}
+.mb-30{margin-bottom : 30px}
+.mb-20{margin-bottom : 20px}
+.mb-10{margin-bottom : 10px}
+.ml-100{margin-left : 100px}
+.ml-90{margin-left : 90px}
+.ml-80{margin-left : 80px}
+.ml-70{margin-left : 70px}
+.ml-60{margin-left : 60px}
+.ml-50{margin-left : 50px}
+.ml-40{margin-left : 40px}
+.ml-30{margin-left : 30px}
+.ml-20{margin-left : 20px}
+.ml-10{margin-left : 10px}
+.auto{margin : 0 auto}
+/* CSS 레이아웃 4대*/
+.flo-l{float : left}
+.flo-r{float : right}
+.dis-i{display : inline}
+.dis-b{display : block}
+.dis-x{display : none}
+.dis-h{display : hidden}
+.dis-c{display : table-cell}
+.dis-a{display : absolute}
+.dis-r{display : relative}
+.pos-f{position: fixed;}
+.ver-t{vertical-align: top}
+.ver-m{vertical-align: middle}
+.ver-b{vertical-align: bottom}
+.txt-l{text-align: left}
+.txt-r{text-align: right}
+.txt-c{text-align: center}
+.both{clear : both}
+.bg-darkblue{background-color: #372c85}
+.z-100{ z-index:100; }
+
+
+
+
+
+
+

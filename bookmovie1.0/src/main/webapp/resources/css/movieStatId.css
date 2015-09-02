@@ -1,0 +1,106 @@
+@CHARSET "UTF-8";
+
+#stat-content{ padding:10px; margin:0 auto; width:1600px; }
+
+#stat-content *{ vertical-align:top; }
+
+
+#stat-content input, 
+#stat-content a,
+#stat-content p,
+#stat-content option,
+#stat-content select{ font-size:15pt; }
+
+#stat-content a:hover{ text-decoration:none; color:#38ADC1; }
+#stat-content a:visited{ color:#38ADC1; }
+
+#stat-content ul,
+#stat-content ol{ list-style-type:none;  }
+#stat-content li{ color:#000; font-size:16pt; }
+
+
+#stat-content th,
+#stat-content td{ border-collapse:collapse; }
+
+#stat-content h1,
+#stat-content h2,
+#stat-content h3{ margin:10px 0; margin-left:3px; }
+
+#stat-content h1{ font-size:24pt; font-weight:bold; color:#38ADC1; }
+#stat-content h2{ font-size:18pt; font-weight:bold; color:#F29661; }
+#stat-content h3{ font-size:16pt; font-weight:bold; color:#9FC93C; }
+
+#stat-content select{ height:33px; }
+
+#stat-content #control-stat-panel #alert{ font-size:15pt; display:inline-block; margin-left:10px; }
+
+#stat-content #user-stat-detail{ display:none; }
+
+
+#stat-content #favorite-movie-categories,
+#stat-content #read-stat,
+#stat-content #favorite-genre{ display:inline-block; min-width:250px; min-height:250px; }
+
+#stat-content ul.category-list li:hover{ background-color:#F6F6F6; cursor:pointer; color:#337ab7; }
+
+#stat-content table#favorite-movies{ border:3px solid #EAEAEA; padding:0px; border-collapse:collapse; width:800px; }
+#stat-content table#favorite-movies *{ text-align:center; }
+#stat-content table#favorite-movies th{ border-bottom:3px solid #DCDCDC; font-size:16pt; font-weight:bold; text-align:center; vertical-align:middle; padding:6px 0; background-color:#FBFBFB; border-right:1px solid #EAEAEA; border-left:1px solid #EAEAEA; }
+#stat-content table#favorite-movies th:hover{ color:#EDA900; }
+#stat-content table#favorite-movies td{ font-size:15pt; border-right:1px dashed #EAEAEA; border-left:1px dashed #EAEAEA; }
+
+#stat-content #movie-rank ul li{ text-align:center; margin:3px 0; display:inline-block;  }
+
+
+#stat-content table{ width:1000px; margin:10px 0; }
+
+
+#stat-content #popular-movie-list{ width:100%; border:6px solid #EAEAEA; }
+#stat-content #popular-movie-list thead th{ 
+	text-align:center; padding:10px; font-weight:bold; font-size:20pt; 
+	background: -webkit-linear-gradient(#FFFFFF, #EAEAEA); /* For Safari 5.1 to 6.0 */
+	background: -o-linear-gradient(#FFFFFF, #EAEAEA); /* For Opera 11.1 to 12.0 */
+	background: -moz-linear-gradient(#FFFFFF, #EAEAEA); /* For Firefox 3.6 to 15 */
+	background: linear-gradient(#FFFFFF, #EAEAEA); /* Standard syntax */
+}
+
+#stat-content #popular-movie-list tbody tr{ border-bottom:2px solid #EAEAEA; }
+#stat-content #popular-movie-list tbody tr:hover{ background-color:#EAEAEA; cursor:pointer; }
+#stat-content #popular-movie-list tbody tr td{ padding-top:3px; }
+#stat-content #popular-movie-list tbody tr td:first-child{ text-align:center; border-right:1px solid #EAEAEA; }
+#stat-content #popular-movie-list tbody tr td:nth-child(2),
+#stat-content #popular-movie-list tbody tr td:nth-child(3){ padding-left:10px; }
+#stat-content #popular-movie-list tbody .rank{ font-size:28pt; font-weight:bold; vertical-align:middle; padding:40px 0;}
+
+#stat-content #popular-movie-list tbody .movie-title{ font-size:32pt; font-weight:bold; }
+#stat-content #popular-movie-list tbody .movie-info{ padding-left:2px; font-size:24pt; font-weight:bold; color:#009300; margin-top:16px;}
+#stat-content #popular-movie-list tbody .movie-info *{ vertical-align:bottom; }
+#stat-content #popular-movie-list tbody .movie-info .genre{ color:#FFBB00; margin-right:10px; }
+#stat-content #popular-movie-list tbody .rank-info{ margin-bottom:10px; }
+#stat-content #popular-movie-list tbody .rank-info .title{ font-weight:bold; color:#99004C; font-size:16pt; }
+#stat-content #popular-movie-list tbody .rank-info .value{ font-weight:bold; color:#FFBB00; font-size:14pt; }
+#stat-content #popular-movie-list tbody .review-list{ border-top:1px solid #007087; display:inline-block; width:560px; }
+#stat-content #popular-movie-list tbody .review-list li{ color:#008299; }
+
+
+
+#stat-content #movie-rank table#one-top{ text-align:center; }
+#stat-content #movie-rank table#one-top ul.top-rank-panel li:nth-child(1){ padding:25px 50px; background-color:red; font-size:40pt; border:4px solid #FFA7A7; font-weight:bold; color:#FFF; }
+#stat-content #movie-rank table#one-top ul.top-rank-panel li:nth-child(2){ padding:3px 30px; font-size:35pt; font-weight:bold; background-color:#FFBB00; color:#EAEAEA; border:4px solid #FFDF24; }
+
+#stat-content table#movie-rank{ border:3px solid #e7e7e7; }
+#stat-content table#movie-rank td{ padding:10px; border:1px solid #EAEAEA; border-collapse:collapse; }
+#stat-content table#movie-rank td.movie-info:hover{ background-color:#EAEAEA; cursor:pointer; }
+#stat-content table#movie-rank ul.rank-panel li{ font-weight:bold; }
+#stat-content table#movie-rank ul.rank-panel li:nth-child(1){ font-size:24pt; padding:30px 0px; width:125px; text-align:center; }
+#stat-content table#movie-rank ul.rank-panel li:nth-child(2){ font-size:15pt; padding:10px 0px; width:125px; text-align:center; border:4px solid #FFDF24; color:#EAEAEA; background-color:#FFBB00; }
+#stat-content table#movie-rank td:nth-child(1){ text-align:center; padding-bottom:10px; }
+#stat-content table#movie-rank td.movie-info .movie-title{ font-size:24pt; font-weight:bold; color:#5D5D5D; }
+#stat-content table#movie-rank td.movie-info .additional-info{ font-size:16pt; font-weight:bold; color:#8EC7D0; }
+#stat-content table#movie-rank td.movie-info .review-text{ margin-top:10px; font-size:12pt; color:#BDBDBD; }
+
+#stat-content ul#pagination{ margin-top:30px; text-align:center; }
+#stat-content ul#pagination li { display:inline-block; }
+
+#stat-content .point-panel p{ font-size:12pt; color:#747474; font-weight:bold; }
+#stat-content .point-panel p span{ color:#FFBB00; }

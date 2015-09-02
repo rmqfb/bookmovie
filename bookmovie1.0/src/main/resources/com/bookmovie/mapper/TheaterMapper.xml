@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bookmovie.mapper.TheaterMapper">
+    
+    
+    
+    
+    <select id="detail" resultType="Theater" parameterType="Theater">
+      	select 
+        first_time as firstTime,
+        second_time as secondTime,
+        third_time as thirdTime, 
+        fourth_time as fourthTime, 
+        fifth_time as fifthTime,
+        mp_name as mpName, 
+        th_date as thDate, 
+        title as title, 
+        th_name as thName, 
+        th_code as thCode
+        from theater t 
+        join movie m on t.movie_code=m.movie_code
+        where th_code=#{searchVal}
+       
+    </select>
+   
+    <select id="list" resultType="Theater" >
+        select 
+        first_time as firstTime,
+        second_time as secondTime,
+        third_time as thirdTime, 
+        fourth_time as fourthTime, 
+        fifth_time as fifthTime,
+        mp_name as mpName, 
+        th_date as thDate, 
+        title as title, 
+        th_name as thName, 
+        th_code as thCode
+        from theater t 
+        join movie m on t.movie_code=m.movie_code
+        where th_date = #{date}
+     	order by t.MP_NAME desc
+     <!--  where th_date = trunc(sysdate) 이부분에 현재 날짜 가져옴.-->
+    </select>    
+    
+</mapper>

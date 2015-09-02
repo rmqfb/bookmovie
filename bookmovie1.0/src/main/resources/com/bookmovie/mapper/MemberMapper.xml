@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bookmovie.mapper.MemberMapper">
+    <!-- USER_ID NOT NULL VARCHAR2(30) USER_PW VARCHAR2(30) NAME VARCHAR2(30) GENDER VARCHAR2(30) BIRTHDAY VARCHAR2(30) BIRTHDAYRADIO VARCHAR2(30) EMAIL VARCHAR2(30) PHONE VARCHAR2(30) -->
+
+
+<!-- insert 회원가입 -->
+
+
+<insert parameterType="Member" id="insert"> 
+insert into member(user_id, user_pw, name, gender,birthday, birthdayRadio, email, phone_num) 
+values( #{userId},#{userPw},#{name},#{gender},#{birthday},#{birthdayRadio},#{email},#{phone} ) 
+</insert>
+
+<!-- update 회원정보수정 -->
+<update parameterType="Member" id="update"> 
+update member set 
+user_pw=#{userPw}, birthday=#{birthday}, 
+birthdayRadio=#{birthdayRadio}, email=#{email}, 
+phone_num=#{phone} where user_id=#{userId} 
+</update>
+
+<!-- delete 회원탈퇴 -->
+<delete parameterType="Member" id="delete"> 
+delete from member where user_id=#{userId} 
+</delete>
+
+<!-- 로그인 -->
+<select parameterType="Command" id="login" resultType="Member"> 
+ select user_id as userId, 
+        user_pw as userPw, 
+        from member 
+        where user_id=#{searchKey} 
+        and user_pw=#{searchVal} 
+</select>
+
+<select parameterType="Command" id="getElementById" resultType="Member"> 
+  select 
+    user_id as userId, 
+    user_pw as userPw, 
+    name as name, 
+    gender as gender, 
+    birthday as birthday, 
+    email as email, 
+    phone_num as phone
+    from member 
+    where ${searchKey} = #{searchVal} 
+</select>
+
+<select parameterType="Command" id="list" resultType="Member"> 
+  select 
+     user_id as userId, 
+     user_pw as userPw 
+     from 
+     (select rownum as seq, m.* from Member m) 
+     where seq between #{start} and #{end} 
+     order by user_id desc 
+     </select>
+
+<select parameterType="String" id="selectOne" resultType="Member"> 
+  select user_id as userId, user_pw as userPw 
+  from member where user_id=#{userId} 
+  s</select>
+
+<select parameterType="Command" id="countSome" resultType="int"> 
+   select count(user_id) 
+     from member 
+     where ${searchKey} like '%' || #{searchValue} || '%' 
+     </select>
+
+<select id="count" resultType="int"> 
+  select count(*) from member 
+  </select>
+
+<!-- id/pw찾기 -->
+<select parameterType="Member" id="loginSearch" resultType="int">
+ select count(*) from member 
+ where name=#{name} and email=#{email} </select>
+
+<!-- id/pw2찾기 -->
+
+
+<select parameterType="Member" id="getElementsByName" resultType="String"> select * from (select rownum as seq, m.* from Member m where ${searchKey} = #{searchVal}) where seq between #{start} and #{end} order by user_id desc </select>
+
+<!-- id 중복체크 -->
+
+
+<select parameterType="Member" id="idCheck" resultType="int"> select count(*) from member where user_id=#{value} </select>
+       
+    
+</mapper>

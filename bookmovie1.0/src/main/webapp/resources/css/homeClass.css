@@ -1,0 +1,27 @@
+@CHARSET "UTF-8";
+
+.tabMain{
+	margin: 0 auto;
+	border-collapse: collapse; 
+	width: 80%; 
+	height: 400px;
+	text-align: left;
+}
+.centTd{
+	 font-size: 50px;
+	 text-align: center;
+}
+.tabBorder{
+	border: 1px solid black;
+	font-size: 21px;
+	font: bold;
+}
+.centT{
+	font-size: 30px; 
+	text-align: center;	
+}
+.clear{
+	clear: both;
+}
+
+

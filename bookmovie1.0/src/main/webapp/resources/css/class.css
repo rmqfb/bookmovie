@@ -1,0 +1,205 @@
+@CHARSET "UTF-8";
+/* -----------------  movieland 메인 컨트롤러 부분 css -----------------  */
+.mainoutbox{
+      width: 65%;
+     /*  height: 300px; */
+    
+      margin: 0 auto;
+}
+.mainbox{
+    height : 380px; 
+    width : 80%;
+    margin : 20px auto; /* div를 센터로 정렬 시키는 방식 */
+    border: 1px solid black;
+}
+.mainpad{
+    padding: 10 10; /*위 , 아래 를 10, 10 준것이다.  */
+    
+    
+}
+.maintab{
+    border : 1px solid black;
+    width: 400px;
+    height: 350px;
+    
+}
+.maintab tr td{
+    border: 1px solid black; 
+    
+}
+.mainul{
+   list-style: none;
+    
+    
+}
+.mainli{
+    width: 111px;
+    height: 160px;
+    margin: 0 0 0 0 ;
+    padding: 0 0 0 50px ;
+    border: 0;
+    float: left;
+    
+    
+}
+.mainimg{
+    width:120px;
+    height:120px;
+}
+/* ----------------- movieland 메인 컨트롤러 부분 css 끝이다.. ----------------- */
+/* 기존 있엇던 class-css 코드들  */
+.border{
+    border: 1px solid black;
+}
+.bobox{
+    width : 70%;
+    margin : 0 auto; /* div를 센터로 정렬 시키는 방식 */
+    border: 1px solid black;
+}
+.box{
+    width : 100%;
+    margin : 0 auto; /* div를 센터로 정렬 시키는 방식 */
+    border: 1px solid black;
+}
+.centT{
+    font-size: 30px; 
+    text-align: center;
+   /*  font: bold; */
+}
+.center{
+    /* table-layout: ; */
+    margin: 0 auto;
+}
+.centTd{
+     font-size: 50px;
+     text-align: center;
+}
+.clear{
+    clear: both;
+}
+.hidden{
+    display:none;
+}
+.outbox{
+      width: 80%;
+      height: 500px;
+      border: 1px solid black;
+      margin: 0 auto;
+      
+}
+.pad{
+    padding: 10 10; /*위 , 아래 를 10, 10 준것이다.  */
+    
+}
+.tab{
+    width: 800px;
+    height: 800px;
+    border: 1px solid black;
+    font-size: 17px;
+    font: bold;
+    
+}
+.tab tr td{
+    border: 1px solid black; 
+    
+}
+.item{ float : left; width : 100px }
+.footer {
+    margin: 0 auto;
+    height: 60px;
+    padding: 0 0;
+    background: #bbbfbf;
+    font-size: 12px;
+    width: 100%;
+    border-top: 1px solid #51c1f1;
+}
+.share-icons-sidebar{
+    position: fixed;
+    display: block;
+    top: 110px;
+    left: 0;
+    width: 40px;
+    height: 240px;
+}
+.thumb_wrapper{
+    position: relative;
+    margin: 10px auto;
+    padding-top: 80px;
+    width: 100%;
+    max-width: 960px;
+    overflow: hidden;
+    margin: 0 auto;
+    background-color: #eaeaea;
+}
+.thumb {
+    position: relative;
+    top: 0;
+    left: 0;
+    float: left;
+    display: inline;
+    margin: 10px;
+    width: 300px;
+    height: 250px;
+    -webkit-box-shadow: 1px 1px 5px 0 rgba(109,109,109,.3);
+    -moz-box-shadow: 1px 1px 5px 0 rgba(109,109,109,.3);
+    box-shadow: 1px 1px 5px 0 rgba(109,109,109,.3);
+}
+a.thumbb:visited {
+    color: #ff8400;
+}
+.thumbb, a.thumbb {
+    position: absolute;
+    left: -1px;
+    top: -1px;
+    width: 302px;
+    height: 252px;
+    color: #000;
+    background-color: #ccc;
+}
+a:visited {
+    color: #ff8400;
+    text-decoration: none;
+}
+.thumbi {
+    position: absolute;
+    left: 1px;
+    top: 36px;
+    width: 300px;
+    height: 215px;
+    line-height: 211px;
+    text-align: center;
+    background-color: #f6f6f6;
+    background-position: center center;
+    background-repeat: no-repeat;
+}
+.thumbc {
+    font-size: 18px;
+    line-height: 35px;
+    text-align: center;
+}
+.closeBtn{
+    border-radius : 100%;
+    float: right;
+}
+.share-facebook {
+    background-position: 0 0;
+}
+.share-twitter {
+    background-position: -40px 0;
+}
+.share-pinterest {
+    background-position: -80px 0;
+}
+.share-googleplus {
+    background-position: -120px 0;
+}
+.share-linkedin {
+    background-position: -240px 0;
+}
+.share-youtube {
+    background-position: -200px 0;
+}
+.share-email {
+    background-position: -320px 0;
+}
+ 
